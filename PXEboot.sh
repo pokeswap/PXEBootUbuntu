@@ -86,14 +86,14 @@ wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-amd64.iso -q
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-i386.iso -q
 mount -o loop -t iso9660 /tmp/iso/ubuntu-14.04.2-desktop-amd64.iso /mnt/loop
 echo copying files. This may take a while
-cp /mnt/loop/casper/vmlinuz /var/lib/tftpboot/ubuntu/amd64
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/ubuntu/amd64
 cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/ubuntu/amd64
 cp -R /mnt/loop/* /srv/install/ubuntu/amd64
 cp -R /mnt/loop/.disk /srv/install/ubuntu/amd64
 umount /mnt/loop
 rm -f /tmp/iso/ubuntu-14.04.2-desktop-amd64.iso 
 mount -o loop -t iso9660 /tmp/iso/ubuntu-14.04.2-desktop-i386.iso /mnt/loop
-cp /mnt/loop/casper/vmlinuz /var/lib/tftpboot/ubuntu/amd64
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/ubuntu/amd64
 cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/ubuntu/amd64
 cp -R /mnt/loop/* /srv/install/ubuntu/amd64
 cp -R /mnt/loop/.disk /srv/install/ubuntu/amd64
@@ -103,14 +103,14 @@ touch /var/lib/tftpboot/ubuntu/Ubuntu.menu
 cat >> /var/lib/tftpboot/ubuntu/Ubuntu.menu << EOFE
 LABEL 2
         MENU LABEL Ubuntu 14.04.2 LTS (64-bit)
-        KERNEL ubuntu/amd64/vmlinuz
+        KERNEL ubuntu/amd64/vmlinuz.efi
         APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:/srv/install/ubuntu/amd64 initrd=ubuntu/amd64/initrd.lz
         TEXT HELP
         Boot Ubuntu 64-bit
         ENDTEXT
 LABEL 1
         MENU LABEL Ubuntu 14.04.2 LTS (32-bit)
-        KERNEL ubuntu/i386/vmlinuz
+        KERNEL ubuntu/i386/vmlinuz.efi
         APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:/srv/install/ubuntu/i386 initrd=ubuntu/i386/initrd.lz
         TEXT HELP
         Boot Ubuntu 32-bit
