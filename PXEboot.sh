@@ -36,8 +36,9 @@ rm /etc/exports && touch /etc/exports
 echo /etc/exports << EOF
 /srv/install                  10.10.1.0/24(ro,async,no_root_squash,no_subtree_check) 
 EOF
+service nfs-kernel-server stop
 exportfs -a
-service nfs-kernel-server restart
+service nfs-kernel-server start
 mkdir -p /var/lib/tftpboot/{fedora,ubuntu}/{amd64,i386}
 mkdir -p /srv/install/{fedora,ubuntu}/{amd64,i386}
 mkdir -p /mnt/loop
