@@ -1,7 +1,7 @@
 #!/bin/bash
 sudo su -
-apt-get update
-apt-get -y install tftpd-hpa isc-dhcp-server syslinux
+apt-get update > /dev/null
+apt-get -y install tftpd-hpa isc-dhcp-server syslinux > /dev/null
 echo RUN_DAEMON="yes" >> /etc/default/tftpd-hpa
 service tftpd-hpa start
 rm /etc/dhcp/dhcpd.conf && touch /etc/dhcp/dhcpd.conf
@@ -31,7 +31,8 @@ service isc-dhcp-server start
 mkdir -p /var/lib/tftpboot/pxelinux.cfg
 cp /usr/lib/syslinux/pxelinux.0 /var/lib/tftpboot
 touch /var/lib/tftpboot/pxelinux.cfg/default
-mkdir /srv/install && mkdir /tmp/iso
+mkdir -p /srv/install 
+mkdir -p /tmp/iso
 rm /etc/exports && touch /etc/exports
 cat >> /etc/exports << EOF
 /srv/install                  10.10.1.0/24(ro,async,no_root_squash,no_subtree_check) 
