@@ -56,16 +56,10 @@ LABEL BootLocal
         TEXT HELP
         Boot to local hard disk
         ENDTEXT
-MENU BEGIN Ubuntu
-MENU TITLE Ubuntu 
-        LABEL Previous
-        MENU LABEL Previous Menu
-        TEXT HELP
-        Return to previous menu
-        ENDTEXT
-        MENU EXIT
-        MENU SEPARATOR
-        MENU INCLUDE Ubuntu/Ubuntu.menu
+LABEL Ubuntu
+        MENU LABEL Ubuntu
+        KERNEL ubuntu/amd64/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntu/amd64 initrd=ubuntu/amd64/initrd.lz
 MENU END
 EOFE
 cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf << EOFE
