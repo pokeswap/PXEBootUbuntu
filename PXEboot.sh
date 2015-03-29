@@ -5,7 +5,7 @@ apt-get -y install tftpd-hpa isc-dhcp-server syslinux
 echo RUN_DAEMON="yes" >> /etc/default/tftpd-hpa
 service tftpd-hpa start
 rm /etc/dhcp/dhcpd.conf && touch /etc/dhcp/dhcpd.conf
-echo /etc/dhcp/dhcpd.conf << EOF
+cat >> /etc/dhcp/dhcpd.conf << EOF
 ddns-update-style none;
 option domain-name "home.local";
 option domain-name-servers 10.10.1.10;
@@ -33,7 +33,7 @@ cp /usr/lib/syslinux/pxelinux.0 /var/lib/tftpboot
 touch /var/lib/tftpboot/pxelinux.cfg/default
 mkdir /srv/install && mkdir /tmp/iso
 rm /etc/exports && touch /etc/exports
-echo /etc/exports << EOF
+cat >> /etc/exports << EOF
 /srv/install                  10.10.1.0/24(ro,async,no_root_squash,no_subtree_check) 
 EOF
 service nfs-kernel-server stop
@@ -43,7 +43,7 @@ mkdir -p /var/lib/tftpboot/{fedora,ubuntu}/{amd64,i386}
 mkdir -p /srv/install/{fedora,ubuntu}/{amd64,i386}
 mkdir -p /mnt/loop
 cp /usr/lib/syslinux/vesamenu.c32 /var/lib/tftpboot/
-echo /var/lib/tftpboot/pxelinux.cfg/default << EOFE
+cat >> /var/lib/tftpboot/pxelinux.cfg/default << EOFE
 DEFAULT vesamenu.c32 
 TIMEOUT 600
 ONTIMEOUT BootLocal
@@ -67,7 +67,7 @@ MENU TITLE Ubuntu
         MENU INCLUDE Ubuntu/Ubuntu.menu
 MENU END
 EOFE
-echo /var/lib/tftpboot/pxelinux.cfg/pxe.conf << EOFE
+cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf << EOFE
 MENU TITLE  PXE Server 
 MENU BACKGROUND pxelinux.cfg/logo.png
 NOESCAPE 1
@@ -99,7 +99,7 @@ cp -R /mnt/loop/.disk /srv/install/ubuntu/amd64
 umount /mnt/loop
 rm -f /tmp/iso/ubuntu-14.04.2-desktop-i386.iso 
 touch /var/lib/tftpboot/ubuntu/Ubuntu.menu
-echo /var/lib/tftpboot/ubuntu/Ubuntu.menu << EOFE
+cat >> /var/lib/tftpboot/ubuntu/Ubuntu.menu << EOFE
 LABEL 2
         MENU LABEL Ubuntu 14.04.2 LTS (64-bit)
         KERNEL ubuntu/amd64/vmlinuz
