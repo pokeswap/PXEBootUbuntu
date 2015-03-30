@@ -102,8 +102,8 @@ cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/ubuntu/amd64
 cp -R /mnt/loop/* /srv/install/ubuntu/amd64
 cp -R /mnt/loop/.disk /srv/install/ubuntu/amd64
 umount /mnt/loop
-rm -f /tmp/iso/ubuntu-14.04.2-desktop-i386.iso 
-touch /var/lib/tftpboot/ubuntu/Ubuntu.menu
+rm -f /tmp/iso/ubuntu-14.04.2-desktop-i386.iso #remove ISOs when done
+touch /var/lib/tftpboot/ubuntu/Ubuntu.menu #possibly not needed anymore. Still here just in case
 cat >> /var/lib/tftpboot/ubuntu/Ubuntu.menu << EOFE
 LABEL 2
         MENU LABEL Ubuntu 14.04.2 LTS (64-bit)
