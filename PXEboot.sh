@@ -1,8 +1,11 @@
 #!/bin/bash
-sudo su -
+if [ "$(id -u)" != "0" ]; then
+   echo "This script must be run as root" 1>&2
+   exit 1
+fi
 # required packages
 apt-get update > /dev/null
-apt-get -y install tftpd-hpa isc-dhcp-server syslinux > /dev/null
+apt-get -y install tftpd-hpa isc-dhcp-server syslinux nfs-kernel-server > /dev/null
 echo RUN_DAEMON="yes" >> /etc/default/tftpd-hpa
 service tftpd-hpa start
 rm /etc/dhcp/dhcpd.conf && touch /etc/dhcp/dhcpd.conf
