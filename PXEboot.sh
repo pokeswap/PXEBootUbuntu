@@ -74,6 +74,11 @@ LABEL Ubuntu
         MENU LABEL Ubuntu
         KERNEL ubuntu/amd64/vmlinuz.efi
         APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntu/amd64 initrd=ubuntu/amd64/initrd.lz
+LABEL Ubuntu32
+		MENU LABEL Ubuntu32
+        KERNEL ubuntu/i386/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntu/i386 initrd=ubuntu/i386/initrd.lz
+
 MENU END
 EOFE
 cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf << EOFE 
@@ -92,6 +97,18 @@ cd /tmp/iso
 echo downloading Ubuntu. This may take a while.
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-amd64.iso -q
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-i386.iso -q
+#wget
+#wget
+#wget
+#wget
+#wget
+#wget
+#wget
+#wget
+#wget
+#wget
+#wget
+#wget
 mount -o loop -t iso9660 /tmp/iso/ubuntu-14.04.2-desktop-amd64.iso /mnt/loop
 echo copying files. This may take a while
 #copying nessicary files to boot
@@ -103,10 +120,10 @@ cp -R /mnt/loop/.disk /srv/install/ubuntu/amd64
 umount /mnt/loop
 rm -f /tmp/iso/ubuntu-14.04.2-desktop-amd64.iso 
 mount -o loop -t iso9660 /tmp/iso/ubuntu-14.04.2-desktop-i386.iso /mnt/loop
-cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/ubuntu/amd64
-cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/ubuntu/amd64
-cp -R /mnt/loop/* /srv/install/ubuntu/amd64
-cp -R /mnt/loop/.disk /srv/install/ubuntu/amd64
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/ubuntu/i386
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/ubuntu/i386
+cp -R /mnt/loop/* /srv/install/ubuntu/i386
+cp -R /mnt/loop/.disk /srv/install/ubuntu/i386
 umount /mnt/loop
 rm -f /tmp/iso/ubuntu-14.04.2-desktop-i386.iso #remove ISOs when done
 touch /var/lib/tftpboot/ubuntu/Ubuntu.menu #possibly not needed anymore. Still here just in case
