@@ -6,10 +6,12 @@ fi
 # required packages
 apt-get update > /dev/null
 apt-get -y install tftpd-hpa isc-dhcp-server syslinux nfs-kernel-server > /dev/null
+echo turning on tftpd
 echo RUN_DAEMON="yes" >> /etc/default/tftpd-hpa
 service tftpd-hpa start
 rm /etc/dhcp/dhcpd.conf && touch /etc/dhcp/dhcpd.conf
 # setting up DHCP. If you change the subnet, make sure to change where it is used everywhere
+echo setting up dhcp
 cat >> /etc/dhcp/dhcpd.conf << EOF
 ddns-update-style none;
 option domain-name "home.local";
@@ -32,6 +34,7 @@ subnet 10.10.1.0 netmask 255.255.255.0 {
         next-server 10.10.1.10;
 }
 EOF
+echo starting DHCP server. remember this may change your network settings
 service isc-dhcp-server start 
 #moving files to the right place
 mkdir -p /var/lib/tftpboot/pxelinux.cfg
@@ -45,13 +48,13 @@ cat >> /etc/exports << EOF
 /srv/install                  10.10.1.0/24(ro,async,no_root_squash,no_subtree_check) 
 EOF
 #more NFS exporting 
+echo setting up NFS
 service nfs-kernel-server stop
 exportfs -a
 service nfs-kernel-server start
 #making places to put ISO and files
 mkdir -p /var/lib/tftpboot/{fedora,ubuntu}/{amd64,i386}
 mkdir -p /srv/install/{fedora,ubuntu}/{amd64,i386}
-export mountloc=/mnt/loop
 mkdir -p /mnt/loop 
 cp /usr/lib/syslinux/vesamenu.c32 /var/lib/tftpboot/
 #PXE menu configuration
@@ -73,7 +76,7 @@ LABEL Ubuntu
         APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntu/amd64 initrd=ubuntu/amd64/initrd.lz
 MENU END
 EOFE
-cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf #more configuration << EOFE
+cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf << EOFE 
 MENU TITLE  PXE Server 
 MENU BACKGROUND pxelinux.cfg/logo.png
 NOESCAPE 1
