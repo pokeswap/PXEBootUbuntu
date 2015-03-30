@@ -1,10 +1,12 @@
 #!/bin/bash
 sudo su -
+# required packages
 apt-get update > /dev/null
 apt-get -y install tftpd-hpa isc-dhcp-server syslinux > /dev/null
 echo RUN_DAEMON="yes" >> /etc/default/tftpd-hpa
 service tftpd-hpa start
 rm /etc/dhcp/dhcpd.conf && touch /etc/dhcp/dhcpd.conf
+# setting up DHCP. If you change the subnet, make sure to change where it is used everywhere
 cat >> /etc/dhcp/dhcpd.conf << EOF
 ddns-update-style none;
 option domain-name "home.local";
@@ -28,22 +30,28 @@ subnet 10.10.1.0 netmask 255.255.255.0 {
 }
 EOF
 service isc-dhcp-server start 
+#moving files to the right place
 mkdir -p /var/lib/tftpboot/pxelinux.cfg
 cp /usr/lib/syslinux/pxelinux.0 /var/lib/tftpboot
 touch /var/lib/tftpboot/pxelinux.cfg/default
 mkdir -p /srv/install 
 mkdir -p /tmp/iso
 rm /etc/exports && touch /etc/exports
+# adding exports for NFS
 cat >> /etc/exports << EOF
 /srv/install                  10.10.1.0/24(ro,async,no_root_squash,no_subtree_check) 
 EOF
+#more NFS exporting 
 service nfs-kernel-server stop
 exportfs -a
 service nfs-kernel-server start
+#making places to put ISO and files
 mkdir -p /var/lib/tftpboot/{fedora,ubuntu}/{amd64,i386}
 mkdir -p /srv/install/{fedora,ubuntu}/{amd64,i386}
-mkdir -p /mnt/loop
+export mountloc=/mnt/loop
+mkdir -p /mnt/loop 
 cp /usr/lib/syslinux/vesamenu.c32 /var/lib/tftpboot/
+#PXE menu configuration
 cat >> /var/lib/tftpboot/pxelinux.cfg/default << EOFE
 DEFAULT vesamenu.c32 
 TIMEOUT 600
@@ -62,7 +70,7 @@ LABEL Ubuntu
         APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntu/amd64 initrd=ubuntu/amd64/initrd.lz
 MENU END
 EOFE
-cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf << EOFE
+cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf #more configuration << EOFE
 MENU TITLE  PXE Server 
 MENU BACKGROUND pxelinux.cfg/logo.png
 NOESCAPE 1
@@ -80,10 +88,12 @@ wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-amd64.iso -q
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-i386.iso -q
 mount -o loop -t iso9660 /tmp/iso/ubuntu-14.04.2-desktop-amd64.iso /mnt/loop
 echo copying files. This may take a while
+#copying nessicary files to boot
 cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/ubuntu/amd64
 cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/ubuntu/amd64
+#copying files for use by
 cp -R /mnt/loop/* /srv/install/ubuntu/amd64
-cp -R /mnt/loop/.disk /srv/install/ubuntu/amd64
+cp -R /mnt/loop/.disk /srv/install/ubuntu/amd64 
 umount /mnt/loop
 rm -f /tmp/iso/ubuntu-14.04.2-desktop-amd64.iso 
 mount -o loop -t iso9660 /tmp/iso/ubuntu-14.04.2-desktop-i386.iso /mnt/loop
