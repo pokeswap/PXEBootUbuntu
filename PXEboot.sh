@@ -102,6 +102,14 @@ LABEL MythBuntu32
         MENU LABEL MythBuntu32
         KERNEL mythubuntu/i386/vmlinuz.efi
         APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/mythubuntu/i386 initrd=mythubuntu/1386/initrd.lz
+ LABEL UbuntuStudio
+        MENU LABEL UbuntuStudio
+        KERNEL ubuntustudio/amd64/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntustudio/amd64 initrd=ubuntustudio/amd64/initrd.lz
+LABEL UbuntuStudio32
+        MENU LABEL UbuntuStudio32
+        KERNEL ubuntustudio/i386/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntustudio/i386 initrd=ubuntustudio/1386/initrd.lz
 MENU END
 EOFE
 cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf << EOFE 
@@ -126,8 +134,8 @@ wget http://cdimage.ubuntu.com/ubuntu-gnome/releases/14.10/release/ubuntu-gnome-
 wget http://cdimage.ubuntu.com/ubuntu-gnome/releases/14.10/release/ubuntu-gnome-14.10-desktop-i386.iso -q
 wget http://cdimage.ubuntu.com/mythbuntu/releases/14.04.2/release/mythbuntu-14.04.2-desktop-amd64.iso -q
 wget http://cdimage.ubuntu.com/mythbuntu/releases/14.04.2/release/mythbuntu-14.04.2-desktop-i386.iso -q
-#wget
-#wget
+wget http://cdimage.ubuntu.com/ubuntustudio/releases/trusty/release/ubuntustudio-14.04-dvd-amd64.iso -q 
+wget http://cdimage.ubuntu.com/ubuntustudio/releases/trusty/release/ubuntustudio-14.04-dvd-i386.iso -q
 #wget
 #wget
 #wget
@@ -203,6 +211,24 @@ cp -R /mnt/loop/* /srv/install/mythubuntu/i386
 cp -R /mnt/loop/.disk /srv/install/mythubuntu/i386 
 umount /mnt/loop
 rm -f /tmp/iso/mythbuntu-14.04.2-desktop-i386.iso
+mount -o loop -t iso9660 /tmp/iso/ubuntustudio-14.04-dvd-amd64.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/ubuntustudio/amd64
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/ubuntustudio/amd64
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/ubuntustudio/amd64
+cp -R /mnt/loop/.disk /srv/install/ubuntustudio/amd64 
+umount /mnt/loop
+rm -f /tmp/iso/ubuntustudio-14.04-dvd-amd64.iso
+mount -o loop -t iso9660 /tmp/iso/ubuntustudio-14.04-dvd-i386.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/ubuntustudio/i386
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/ubuntustudio/i386
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/ubuntustudio/i386
+cp -R /mnt/loop/.disk /srv/install/ubuntustudio/i386 
+umount /mnt/loop
+rm -f /tmp/iso/ubuntustudio-14.04-dvd-i386.iso
 touch /var/lib/tftpboot/ubuntu/Ubuntu.menu #possibly not needed anymore. Still here just in case
 cat >> /var/lib/tftpboot/ubuntu/Ubuntu.menu << EOFE
 LABEL 2
