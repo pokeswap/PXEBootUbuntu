@@ -53,8 +53,8 @@ service nfs-kernel-server stop
 exportfs -a
 service nfs-kernel-server start
 #making places to put ISO and files
-mkdir -p /var/lib/tftpboot/{fedora,ubuntu}/{amd64,i386}
-mkdir -p /srv/install/{fedora,ubuntu}/{amd64,i386}
+mkdir -p /var/lib/tftpboot/{ubuntu,Edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio}/{amd64,i386}
+mkdir -p /srv/install/{ubuntu,Edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio}/{amd64,i386}
 mkdir -p /mnt/loop 
 cp /usr/lib/syslinux/vesamenu.c32 /var/lib/tftpboot/
 #PXE menu configuration
@@ -75,10 +75,17 @@ LABEL Ubuntu
         KERNEL ubuntu/amd64/vmlinuz.efi
         APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntu/amd64 initrd=ubuntu/amd64/initrd.lz
 LABEL Ubuntu32
-		MENU LABEL Ubuntu32
+	MENU LABEL Ubuntu32
         KERNEL ubuntu/i386/vmlinuz.efi
         APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntu/i386 initrd=ubuntu/i386/initrd.lz
-
+LABEL EdUbuntu
+        MENU LABEL EdUbuntu
+        KERNEL edubuntu/amd64/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/edubuntu/amd64 initrd=edubuntu/amd64/initrd.lz
+LABEL EdUbuntu32
+	MENU LABEL EdUbuntu32
+        KERNEL edubuntu/i386/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/edubuntu/i386 initrd=edubuntu/i386/initrd.lz
 MENU END
 EOFE
 cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf << EOFE 
@@ -97,8 +104,8 @@ cd /tmp/iso
 echo downloading Ubuntu. This may take a while.
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-amd64.iso -q
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-i386.iso -q
-#wget
-#wget
+wget http://cdimage.ubuntu.com/edubuntu/releases/14.04.2/release/edubuntu-14.04-dvd-amd64.iso -q
+wget http://cdimage.ubuntu.com/edubuntu/releases/14.04.2/release/edubuntu-14.04-dvd-i386.iso -q
 #wget
 #wget
 #wget
@@ -126,6 +133,24 @@ cp -R /mnt/loop/* /srv/install/ubuntu/i386
 cp -R /mnt/loop/.disk /srv/install/ubuntu/i386
 umount /mnt/loop
 rm -f /tmp/iso/ubuntu-14.04.2-desktop-i386.iso #remove ISOs when done
+mount -o loop -t iso9660 /tmp/iso/edubuntu-14.04-dvd-amd64.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/edubuntu/amd64
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/edubuntu/amd64
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/edubuntu/amd64
+cp -R /mnt/loop/.disk /srv/install/edubuntu/amd64 
+umount /mnt/loop
+rm -f /tmp/iso/edubuntu-14.04-dvd-amd64.iso
+mount -o loop -t iso9660 /tmp/iso/edubuntu-14.04-dvd-i386.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/edubuntu/i386
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/edubuntu/i386
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/edubuntu/i386
+cp -R /mnt/loop/.disk /srv/install/edubuntu/i386 
+umount /mnt/loop
+rm -f /tmp/iso/edubuntu-14.04-dvd-i386.iso
 touch /var/lib/tftpboot/ubuntu/Ubuntu.menu #possibly not needed anymore. Still here just in case
 cat >> /var/lib/tftpboot/ubuntu/Ubuntu.menu << EOFE
 LABEL 2
