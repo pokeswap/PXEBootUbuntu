@@ -86,6 +86,14 @@ LABEL EdUbuntu32
 	MENU LABEL EdUbuntu32
         KERNEL edubuntu/i386/vmlinuz.efi
         APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/edubuntu/i386 initrd=edubuntu/i386/initrd.lz
+LABEL UbuntuGnome
+        MENU LABEL UbuntuGnome
+        KERNEL ubuntugnome/amd64/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntugnome/amd64 initrd=ubuntugnome/amd64/initrd.lz
+LABEL UbuntuGnome32
+        MENU LABEL UbuntuGnome32
+        KERNEL ubuntugnome/i386/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntugnome/i386 initrd=ubuntugnome/1386/initrd.lz
 MENU END
 EOFE
 cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf << EOFE 
@@ -106,8 +114,8 @@ wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-amd64.iso -q
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-i386.iso -q
 wget http://cdimage.ubuntu.com/edubuntu/releases/14.04.2/release/edubuntu-14.04-dvd-amd64.iso -q
 wget http://cdimage.ubuntu.com/edubuntu/releases/14.04.2/release/edubuntu-14.04-dvd-i386.iso -q
-#wget
-#wget
+wget http://cdimage.ubuntu.com/ubuntu-gnome/releases/14.10/release/ubuntu-gnome-14.10-desktop-amd64.iso
+wget http://cdimage.ubuntu.com/ubuntu-gnome/releases/14.10/release/ubuntu-gnome-14.10-desktop-i386.iso
 #wget
 #wget
 #wget
