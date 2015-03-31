@@ -53,8 +53,8 @@ service nfs-kernel-server stop
 exportfs -a
 service nfs-kernel-server start
 #making places to put ISO and files
-mkdir -p /var/lib/tftpboot/{ubuntu,Edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio}/{amd64,i386}
-mkdir -p /srv/install/{ubuntu,Edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio}/{amd64,i386}
+mkdir -p /var/lib/tftpboot/{ubuntu,edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio}/{amd64,i386}
+mkdir -p /srv/install/{ubuntu,edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio}/{amd64,i386}
 mkdir -p /mnt/loop 
 cp /usr/lib/syslinux/vesamenu.c32 /var/lib/tftpboot/
 #PXE menu configuration
@@ -94,6 +94,14 @@ LABEL UbuntuGnome32
         MENU LABEL UbuntuGnome32
         KERNEL ubuntugnome/i386/vmlinuz.efi
         APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntugnome/i386 initrd=ubuntugnome/1386/initrd.lz
+LABEL MythBuntu
+        MENU LABEL MythBuntu
+        KERNEL mythubuntu/amd64/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/mythubuntu/amd64 initrd=mythubuntu/amd64/initrd.lz
+LABEL MythBuntu32
+        MENU LABEL MythBuntu32
+        KERNEL mythubuntu/i386/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/mythubuntu/i386 initrd=mythubuntu/1386/initrd.lz
 MENU END
 EOFE
 cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf << EOFE 
@@ -114,10 +122,10 @@ wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-amd64.iso -q
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-i386.iso -q
 wget http://cdimage.ubuntu.com/edubuntu/releases/14.04.2/release/edubuntu-14.04-dvd-amd64.iso -q
 wget http://cdimage.ubuntu.com/edubuntu/releases/14.04.2/release/edubuntu-14.04-dvd-i386.iso -q
-wget http://cdimage.ubuntu.com/ubuntu-gnome/releases/14.10/release/ubuntu-gnome-14.10-desktop-amd64.iso
-wget http://cdimage.ubuntu.com/ubuntu-gnome/releases/14.10/release/ubuntu-gnome-14.10-desktop-i386.iso
-#wget
-#wget
+wget http://cdimage.ubuntu.com/ubuntu-gnome/releases/14.10/release/ubuntu-gnome-14.10-desktop-amd64.iso -q
+wget http://cdimage.ubuntu.com/ubuntu-gnome/releases/14.10/release/ubuntu-gnome-14.10-desktop-i386.iso -q
+wget http://cdimage.ubuntu.com/mythbuntu/releases/14.04.2/release/mythbuntu-14.04.2-desktop-amd64.iso -q
+wget http://cdimage.ubuntu.com/mythbuntu/releases/14.04.2/release/mythbuntu-14.04.2-desktop-i386.iso -q
 #wget
 #wget
 #wget
@@ -159,6 +167,42 @@ cp -R /mnt/loop/* /srv/install/edubuntu/i386
 cp -R /mnt/loop/.disk /srv/install/edubuntu/i386 
 umount /mnt/loop
 rm -f /tmp/iso/edubuntu-14.04-dvd-i386.iso
+mount -o loop -t iso9660 /tmp/iso/mythbuntu-14.04.2-desktop-amd64.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/mythubuntu/amd64
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/mythubuntu/amd64
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/mythubuntu/amd64
+cp -R /mnt/loop/.disk /srv/install/mythubuntu/amd64 
+umount /mnt/loop
+rm -f /tmp/iso/mythbuntu-14.04.2-desktop-amd64.iso
+mount -o loop -t iso9660 /tmp/iso/ubuntu-gnome-14.10-desktop-amd64.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/ubuntugnome/amd64
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/ubuntugnome/amd64
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/ubuntugnome/amd64
+cp -R /mnt/loop/.disk /srv/install/ubuntugnome/amd64 
+umount /mnt/loop
+rm -f /tmp/iso/edubuntu-14.04-dvd-amd64.iso
+mount -o loop -t iso9660 /tmp/iso/ubuntu-gnome-14.10-desktop-i386.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/ubuntugnome/i386
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/ubuntugnome/i386
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/ubuntugnome/i386
+cp -R /mnt/loop/.disk /srv/install/ubuntugnome/i386 
+umount /mnt/loop
+rm -f /tmp/iso/ubuntu-gnome-14.10-desktop-i386.iso
+mount -o loop -t iso9660 /tmp/iso/mythbuntu-14.04.2-desktop-i386.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/mythubuntu/i386
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/mythubuntu/i386
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/mythubuntu/i386
+cp -R /mnt/loop/.disk /srv/install/mythubuntu/i386 
+umount /mnt/loop
+rm -f /tmp/iso/mythbuntu-14.04.2-desktop-i386.iso
 touch /var/lib/tftpboot/ubuntu/Ubuntu.menu #possibly not needed anymore. Still here just in case
 cat >> /var/lib/tftpboot/ubuntu/Ubuntu.menu << EOFE
 LABEL 2
