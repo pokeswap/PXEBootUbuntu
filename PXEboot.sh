@@ -53,8 +53,8 @@ service nfs-kernel-server stop
 exportfs -a
 service nfs-kernel-server start
 #making places to put ISO and files
-mkdir -p /var/lib/tftpboot/{ubuntu,edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio}/{amd64,i386}
-mkdir -p /srv/install/{ubuntu,edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio}/{amd64,i386}
+mkdir -p /var/lib/tftpboot/{ubuntu,edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio,xubuntu}/{amd64,i386}
+mkdir -p /srv/install/{ubuntu,edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio,xubuntu}/{amd64,i386}
 mkdir -p /mnt/loop 
 cp /usr/lib/syslinux/vesamenu.c32 /var/lib/tftpboot/
 #PXE menu configuration
@@ -110,6 +110,22 @@ LABEL UbuntuStudio32
         MENU LABEL UbuntuStudio32
         KERNEL ubuntustudio/i386/vmlinuz.efi
         APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntustudio/i386 initrd=ubuntustudio/1386/initrd.lz
+LABEL Lubuntu
+        MENU LABEL Lubuntu
+        KERNEL lubuntu/amd64/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/lubuntu/amd64 initrd=lubuntu/amd64/initrd.lz
+LABEL Lubuntu32
+        MENU LABEL Lubuntu32
+        KERNEL lubuntu/i386/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/lubuntu/i386 initrd=lubuntu/1386/initrd.lz
+LABEL Xubuntu
+        MENU LABEL Xubuntu
+        KERNEL xubuntu/amd64/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/xubuntu/amd64 initrd=xubuntu/amd64/initrd.lz
+LABEL Xubuntu32
+        MENU LABEL Xubuntu32
+        KERNEL xubuntu/i386/vmlinuz.efi
+        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/xubuntu/i386 initrd=xubuntu/1386/initrd.lz
 MENU END
 EOFE
 cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf << EOFE 
@@ -125,7 +141,7 @@ MENU MARGIN 10
 menu color border               30;44      #ffffffff #00000000 std
 EOFE
 cd /tmp/iso
-echo downloading Ubuntu. This may take a while.
+echo downloading Ubuntu (all of them). This may take a while.
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-amd64.iso -q
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-i386.iso -q
 wget http://cdimage.ubuntu.com/edubuntu/releases/14.04.2/release/edubuntu-14.04-dvd-amd64.iso -q
@@ -136,11 +152,13 @@ wget http://cdimage.ubuntu.com/mythbuntu/releases/14.04.2/release/mythbuntu-14.0
 wget http://cdimage.ubuntu.com/mythbuntu/releases/14.04.2/release/mythbuntu-14.04.2-desktop-i386.iso -q
 wget http://cdimage.ubuntu.com/ubuntustudio/releases/trusty/release/ubuntustudio-14.04-dvd-amd64.iso -q 
 wget http://cdimage.ubuntu.com/ubuntustudio/releases/trusty/release/ubuntustudio-14.04-dvd-i386.iso -q
-#wget
-#wget
-#wget
-#wget
-mount -o loop -t iso9660 /tmp/iso/ubuntu-14.04.2-desktop-amd64.iso /mnt/loop
+wget http://cdimage.ubuntu.com/lubuntu/releases/14.04/release/lubuntu-14.04.2-desktop-i386.iso -q
+wget http://cdimage.ubuntu.com/lubuntu/releases/14.04/release/lubuntu-14.04.2-desktop-amd64.iso -q
+wget http://cdimage.ubuntu.com/kubuntu/releases/trusty/release/kubuntu-14.04.2-desktop-i386.iso -q
+wget http://cdimage.ubuntu.com/kubuntu/releases/trusty/release/kubuntu-14.04.2-desktop-amd64.iso -q
+wget http://cdimage.ubuntu.com/xubuntu/releases/trusty/release/xubuntu-14.04.2-desktop-i386.iso -q
+wget http://cdimage.ubuntu.com/xubuntu/releases/trusty/release/xubuntu-14.04.2-desktop-amd64.iso -q
+mount -o loop -t iso9660 /tmp/iso/ubuntu-14.04.2-desktop-amd64.iso /mnt/loop 
 echo copying files. This may take a while
 #copying nessicary files to boot
 cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/ubuntu/amd64
@@ -229,20 +247,58 @@ cp -R /mnt/loop/* /srv/install/ubuntustudio/i386
 cp -R /mnt/loop/.disk /srv/install/ubuntustudio/i386 
 umount /mnt/loop
 rm -f /tmp/iso/ubuntustudio-14.04-dvd-i386.iso
+mount -o loop -t iso9660 /tmp/iso/lubuntu-14.04.2-desktop-amd64.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/lubuntu/amd64
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/lubuntu/amd64
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/lubuntu/amd64
+cp -R /mnt/loop/.disk /srv/install/lubuntu/amd64 
+umount /mnt/loop
+rm -f /tmp/iso/lubuntu-14.04.2-desktop-amd64.iso
+mount -o loop -t iso9660 /tmp/iso/lubuntu-14.04.2-desktop-i386.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/lubuntu/i386
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/lubuntu/i386
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/lubuntu/i386
+cp -R /mnt/loop/.disk /srv/install/lubuntu/i386 
+umount /mnt/loop
+rm -f /tmp/iso/lubuntu-14.04.2-desktop-i386.iso
+mount -o loop -t iso9660 /tmp/iso/kubuntu-14.04.2-desktop-amd64.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/kubuntu/amd64
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/kubuntu/amd64
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/kubuntu/amd64
+cp -R /mnt/loop/.disk /srv/install/kubuntu/amd64 
+umount /mnt/loop
+rm -f /tmp/iso/kubuntu-14.04.2-desktop-amd64.iso
+mount -o loop -t iso9660 /tmp/iso/kubuntu-14.04.2-desktop-i386.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/kubuntu/i386
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/kubuntu/i386
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/kubuntu/i386
+cp -R /mnt/loop/.disk /srv/install/kubuntu/i386 
+umount /mnt/loop
+rm -f /tmp/iso/kubuntu-14.04.2-desktop-i386.iso
+mount -o loop -t iso9660 /tmp/iso/xubuntu-14.04.2-desktop-amd64.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/xubuntu/amd64
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/xubuntu/amd64
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/xubuntu/amd64
+cp -R /mnt/loop/.disk /srv/install/xubuntu/amd64 
+umount /mnt/loop
+rm -f /tmp/iso/xubuntu-14.04.2-desktop-amd64.iso
+mount -o loop -t iso9660 /tmp/iso/xubuntu-14.04.2-desktop-i386.iso /mnt/loop
+#copying nessicary files to boot
+cp /mnt/loop/casper/vmlinuz.efi /var/lib/tftpboot/xubuntu/i386
+cp /mnt/loop/casper/initrd.lz /var/lib/tftpboot/xubuntu/i386
+#copying files for use by
+cp -R /mnt/loop/* /srv/install/xubuntu/i386
+cp -R /mnt/loop/.disk /srv/install/xubuntu/i386 
+umount /mnt/loop
+rm -f /tmp/iso/xubuntu-14.04.2-desktop-i386.iso
 touch /var/lib/tftpboot/ubuntu/Ubuntu.menu #possibly not needed anymore. Still here just in case
-cat >> /var/lib/tftpboot/ubuntu/Ubuntu.menu << EOFE
-LABEL 2
-        MENU LABEL Ubuntu 14.04.2 LTS (64-bit)
-        KERNEL ubuntu/amd64/vmlinuz.efi
-        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:/srv/install/ubuntu/amd64 initrd=ubuntu/amd64/initrd.lz
-        TEXT HELP
-        Boot Ubuntu 64-bit
-        ENDTEXT
-LABEL 1
-        MENU LABEL Ubuntu 14.04.2 LTS (32-bit)
-        KERNEL ubuntu/i386/vmlinuz.efi
-        APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:/srv/install/ubuntu/i386 initrd=ubuntu/i386/initrd.lz
-        TEXT HELP
-        Boot Ubuntu 32-bit
-        ENDTEXT
-EOFE
