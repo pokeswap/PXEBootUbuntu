@@ -141,7 +141,7 @@ MENU MARGIN 10
 menu color border               30;44      #ffffffff #00000000 std
 EOFE
 cd /tmp/iso
-echo downloading Ubuntu (all of them). This may take a while.
+echo "downloading Ubuntu (all of them). This may take a while."
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-amd64.iso -q
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-i386.iso -q
 wget http://cdimage.ubuntu.com/edubuntu/releases/14.04.2/release/edubuntu-14.04-dvd-amd64.iso -q
