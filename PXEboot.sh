@@ -1,3 +1,5 @@
+# copyright (c) Justin Keller, you may freeley distribute this software AS IS without any modifications, but the project in which it is used must be "open-source" and covered under the GPL or MIT license.
+#if you would like to change the file, issue a pull request, and it may be approved
 #!/bin/bash
 if [ "$(id -u)" != "0" ]; then
    echo "This script must be run as root" 1>&2
