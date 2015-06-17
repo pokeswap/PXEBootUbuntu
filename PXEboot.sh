@@ -7,7 +7,7 @@ if [ "$(id -u)" != "0" ]; then
 fi
 # required packages
 apt-get update > /dev/null
-apt-get -y install tftpd-hpa isc-dhcp-server syslinux nfs-kernel-server > /dev/null
+apt-get -y install tftpd-hpa isc-dhcp-server syslinux nfs-kernel-server samba apache2 cifs-utils> /dev/null
 echo turning on tftpd
 echo RUN_DAEMON="yes" >> /etc/default/tftpd-hpa
 service tftpd-hpa start
@@ -38,6 +38,7 @@ subnet 10.10.1.0 netmask 255.255.255.0 {
 EOF
 echo starting DHCP server. remember this may change your network settings
 service isc-dhcp-server start 
+
 #moving files to the right place
 mkdir -p /var/lib/tftpboot/pxelinux.cfg
 cp /usr/lib/syslinux/pxelinux.0 /var/lib/tftpboot
@@ -55,8 +56,8 @@ service nfs-kernel-server stop
 exportfs -a
 service nfs-kernel-server start
 #making places to put ISO and files
-mkdir -p /var/lib/tftpboot/{ubuntu,edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio,xubuntu}/{amd64,i386}
-mkdir -p /srv/install/{ubuntu,edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio,xubuntu}/{amd64,i386}
+mkdir -p /var/lib/tftpboot/{ubuntu,dban,clonezilla,edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio,xubuntu}/{amd64,i386}
+mkdir -p /srv/install/{ubuntu,dban,clonezilla,edubuntu,ubuntugnome,kubuntu,lubuntu,mythubuntu,ubuntustudio,xubuntu}/{amd64,i386}
 mkdir -p /mnt/loop 
 cp /usr/lib/syslinux/vesamenu.c32 /var/lib/tftpboot/
 #PXE menu configuration
@@ -96,6 +97,10 @@ LABEL UbuntuGnome32
         MENU LABEL UbuntuGnome32
         KERNEL ubuntugnome/i386/vmlinuz.efi
         APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/ubuntugnome/i386 initrd=ubuntugnome/1386/initrd.lz
+LABEL DBAN
+	 MENU LABEL DBAN
+         KERNEL dban-2.2.8_i586/dban.bzi
+         APPEND nuke= "dwipe" silent floppy=0,16,cmos"
 LABEL MythBuntu
         MENU LABEL MythBuntu
         KERNEL mythubuntu/amd64/vmlinuz.efi
@@ -130,9 +135,8 @@ LABEL Xubuntu32
         APPEND boot=casper netboot=nfs nfsroot=10.10.1.10:srv/install/xubuntu/i386 initrd=xubuntu/1386/initrd.lz
 MENU END
 EOFE
-cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf << EOFE 
+cat >> /var/lib/tftpboot/pxelinux.cfg/pxe.conf << EOFEO 
 MENU TITLE  PXE Server 
-MENU BACKGROUND pxelinux.cfg/logo.png
 NOESCAPE 1
 ALLOWOPTIONS 1
 PROMPT 0
@@ -140,12 +144,46 @@ menu width 80
 menu rows 14
 MENU TABMSGROW 24
 MENU MARGIN 10
-menu color border               30;44      #ffffffff #00000000 std
-EOFE
+menu color border      
+EOFEO
 cd /tmp/iso
+echo "enter smbpassword. The screen wil remain blank"
+useradd -u 1737 -s /bin/bash -M -l PXEmainuser
+smbpasswd -a PXEmainuser
+mkdir /var/www/html/PXEscripts
+echo "Apache configuration"
+mkdir /var/www/html/3.Scripts
+cp ~/Downloads/pxe_create.sh /var/www/html/3.Scripts
+mkdir /var/www/html/images
+mkdir /var/www/html/reports
+rm /var/www/html/index.html
+chmod -R 777 /var/www/html
+chown -R user /var/www/html/images
+chown -R user /var/www/html/reports
+ln -s /var/lib/tftpboot /var/www/html
+cat >> /etc/samba/smb.conf << EOF
+[images]
+path = /var/www/html/images
+available = yes
+valid users = PXEmainuser
+read only = no
+browseable = yes
+public = yes
+guest ok = yes
+[reports]
+path = /var/www/html/reports
+available = yes
+valid users = PXEmainuser
+read only = no
+browseable = yes
+public = yes
+guest ok = yes
+EOF
 echo "downloading Ubuntu (all of them). This may take a while."
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-amd64.iso -q
+wget http://downloads.sourceforge.net/project/dban/dban/dban-2.2.8/dban-2.2.8_i586.iso -q
 wget http://releases.ubuntu.com/14.04.2/ubuntu-14.04.2-desktop-i386.iso -q
+wget http://downloads.sourceforge.net/project/clonezilla/clonezilla_live_stable/2.3.2-22/clonezilla-live-2.3.2-22-i586.iso -q
 wget http://cdimage.ubuntu.com/edubuntu/releases/14.04.2/release/edubuntu-14.04-dvd-amd64.iso -q
 wget http://cdimage.ubuntu.com/edubuntu/releases/14.04.2/release/edubuntu-14.04-dvd-i386.iso -q
 wget http://cdimage.ubuntu.com/ubuntu-gnome/releases/14.10/release/ubuntu-gnome-14.10-desktop-amd64.iso -q
@@ -160,6 +198,16 @@ wget http://cdimage.ubuntu.com/kubuntu/releases/trusty/release/kubuntu-14.04.2-d
 wget http://cdimage.ubuntu.com/kubuntu/releases/trusty/release/kubuntu-14.04.2-desktop-amd64.iso -q
 wget http://cdimage.ubuntu.com/xubuntu/releases/trusty/release/xubuntu-14.04.2-desktop-i386.iso -q
 wget http://cdimage.ubuntu.com/xubuntu/releases/trusty/release/xubuntu-14.04.2-desktop-amd64.iso -q
+mount -o loop -t iso9660 /tmp/iso/dban-2.2.8_i586.iso /mnt/loop
+cp /mnt/loop/dban.bzi /var/lib/tftpboot/dban/dban.bzi
+umount /mnt/loop
+rm /tmp/iso/dban-2.2.8_i586.iso
+mount -o loop -t iso9660 /tmp/iso/clonezilla-live-2.3.2-22-i586.iso /mnt/loop
+cp /mnt/loop/live/vmlinuz /var/lib/tftpboot/clonezilla
+cp /mnt/loop/live/initrd.img /var/lib/tftpboot/clonezilla
+cp /mnt/loop/live/filesystem.squashfs /var/lib/tftpboot/clonezilla
+umount /mnt/loop
+rm /tmp/iso/clonezilla-live-2.3.2-22-i586.iso
 mount -o loop -t iso9660 /tmp/iso/ubuntu-14.04.2-desktop-amd64.iso /mnt/loop 
 echo copying files. This may take a while
 #copying nessicary files to boot
