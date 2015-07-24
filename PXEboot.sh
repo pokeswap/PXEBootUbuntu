@@ -100,7 +100,7 @@ LABEL UbuntuGnome32
 LABEL DBAN
 	 MENU LABEL DBAN
          KERNEL dban-2.2.8_i586/dban.bzi
-         APPEND nuke= "dwipe" silent floppy=0,16,cmos"
+         APPEND nuke= "dwipe" silent floppy=0,16,cmos
 LABEL MythBuntu
         MENU LABEL MythBuntu
         KERNEL mythubuntu/amd64/vmlinuz.efi
